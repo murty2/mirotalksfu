@@ -8,7 +8,7 @@
 
 * Disable about button
 
-* Support multiple logins for the server
+* Enable login for server and support multiple logins for the same
 
 * Username and room name are extracted from the server login automatically
 

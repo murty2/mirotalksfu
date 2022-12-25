@@ -131,7 +131,7 @@ $ npm install -g npm@latest
 $ git clone https://github.com/miroslavpejic85/mirotalksfu.git
 # Go to to dir mirotalksfu
 $ cd mirotalksfu
-# Copy app/src/config.template.js in app/src/config.js and edit it if needed
+# Copy app/src/config.template.js in app/src/config.js and edit login/password pairs in accounts: block
 $ cp app/src/config.template.js app/src/config.js
 # Install dependencies - be patient, the first time will take a few minutes, in the meantime have a good coffee ;)
 $ npm install

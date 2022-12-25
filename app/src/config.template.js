@@ -22,16 +22,14 @@ const getLocalIp = () => {
 // https://api.ipify.org
 
 module.exports = {
-    /*
-        Host Protection (default False)
-        In order to protect your host set 
-        hostProtected to true and set your own Username and Password
-    */
-    hostProtected: false,
-    hostUsername: 'username',
-    hostPassword: 'password',
+    // username format: roomname_user
+    accounts: {
+      cc1_user: 'pass1',
+      cc1_john_va: 'pass2',
+    },
+
     // app listen on
-    listenIp: '0.0.0.0',
+    listenIp: '127.0.0.1',
     listenPort: process.env.PORT || 3010,
     // ssl/README.md
     sslCrt: '../ssl/cert.pem',
@@ -128,7 +126,7 @@ module.exports = {
         webRtcTransport: {
             listenIps: [
                 {
-                    ip: '0.0.0.0',
+                    ip: '127.0.0.1',
                     announcedIp: getLocalIp(), // replace by public static IP address https://api.ipify.org
                 },
             ],
