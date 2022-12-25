@@ -1,13 +1,13 @@
 'use strict';
 
 /**
- * MiroTalk SFU - Client component
+ *  - Client component
  *
- * @link    GitHub: https://github.com/miroslavpejic85/mirotalksfu
+ * @link    GitHub: https://github.com/miroslavpejic85/sfu
  * @link    Live demo: https://sfu.mirotalk.com
  * @license For open source use: AGPLv3
- * @license For commercial or closed source, contact us at license.mirotalk@gmail.com or buy directly via CodeCanyon
- * @license CodeCanyon: https://codecanyon.net/item/mirotalk-sfu-webrtc-realtime-video-conferences/40769970
+ * @license For commercial or closed source, contact us at license.@gmail.com or buy directly via CodeCanyon
+ * @license CodeCanyon: https://codecanyon.net/item/-sfu-webrtc-realtime-video-conferences/40769970
  * @author  Miroslav Pejic - miroslav.pejic.85@gmail.com
  * @version 1.0.0
  *
@@ -40,7 +40,7 @@ const html = {
 };
 
 const image = {
-    avatar: '../images/mirotalksfu-logo.png',
+    avatar: '../images/sfu-logo.png',
     audio: '../images/audio.gif',
     poster: '../images/loader.gif',
     delete: '../images/delete.png',
@@ -314,14 +314,10 @@ class RoomClient {
         this.refreshParticipantsCount();
         console.log('06.2 Participants Count ---->', participantsCount);
         // notify && participantsCount == 1 ? shareRoom() : sound('joined');
-        if (notify && participantsCount == 1) {
-            shareRoom();
-        } else {
-            if (this.isScreenAllowed) {
-                this.shareScreen();
-            }
-            sound('joined');
+        if (this.isScreenAllowed) {
+          this.shareScreen();
         }
+        sound('joined');
     }
 
     async loadDevice(routerRtpCapabilities) {
@@ -2920,7 +2916,7 @@ class RoomClient {
         Swal.fire({
             allowOutsideClick: false,
             background: swalBackground,
-            imageAlt: 'mirotalksfu-file-sharing',
+            imageAlt: 'sfu-file-sharing',
             imageUrl: image.share,
             position: 'center',
             title: 'Share file',
@@ -3134,7 +3130,7 @@ class RoomClient {
                     title: 'Received file',
                     text: this.incomingFileInfo.fileName + ' size ' + this.bytesToSize(this.incomingFileInfo.fileSize),
                     imageUrl: e.target.result,
-                    imageAlt: 'mirotalksfu-file-img-download',
+                    imageAlt: 'sfu-file-img-download',
                     showDenyButton: true,
                     confirmButtonText: `Save`,
                     denyButtonText: `Cancel`,

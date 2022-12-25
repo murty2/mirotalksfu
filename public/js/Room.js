@@ -3,12 +3,12 @@
 if (location.href.substr(0, 5) !== 'https') location.href = 'https' + location.href.substr(4, location.href.length - 4);
 
 /**
- * MiroTalk SFU - Room component
+ *  - Room component
  *
- * @link    GitHub: https://github.com/miroslavpejic85/mirotalksfu
+ * @link    GitHub: https://github.com/miroslavpejic85/sfu
  * @link    Live demo: https://sfu.mirotalk.com
  * @license For open source use: AGPLv3
- * @license For commercial or closed source, contact us at info.mirotalk@gmail.com
+ * @license For commercial or closed source, contact us at info.@gmail.com
  * @author  Miroslav Pejic - miroslav.pejic.85@gmail.com
  * @version 1.0.0
  *
@@ -22,7 +22,7 @@ const RoomURL = window.location.href;
 
 const socket = io({ transports: ['websocket'] });
 
-const surveyActive = true;
+const surveyActive = false;
 
 const url = {
     ipLookup: 'https://extreme-ip-lookup.com/json/?key=demo2',
@@ -126,7 +126,6 @@ function initClient() {
         setTippy('chatButton', 'Toggle the chat', 'right');
         setTippy('whiteboardButton', 'Toggle the whiteboard', 'right');
         setTippy('settingsButton', 'Toggle the settings', 'right');
-        setTippy('aboutButton', 'About this project', 'right');
         setTippy('exitButton', 'Leave room', 'right');
         setTippy('mySettingsCloseBtn', 'Close', 'right');
         setTippy('tabDevicesBtn', 'Devices', 'top');
@@ -135,7 +134,6 @@ function initClient() {
         setTippy('tabVideoShareBtn', 'Video share', 'top');
         setTippy('tabAspectBtn', 'Aspect', 'top');
         setTippy('tabStylingBtn', 'Styling', 'top');
-        setTippy('tabLanguagesBtn', 'Languages', 'top');
         setTippy('lobbyAcceptAllBtn', 'Accept', 'top');
         setTippy('lobbyRejectAllBtn', 'Reject', 'top');
         setTippy(
@@ -229,7 +227,7 @@ async function initEnumerateDevices() {
         openURL(`/permission?room_id=${room_id}&message=Not allowed both Audio and Video`);
     } else {
         hide(loadingDiv);
-        getPeerGeoLocation();
+        //getPeerGeoLocation();
         whoAreYou();
     }
 }
@@ -408,52 +406,23 @@ function getPeerGeoLocation() {
 function whoAreYou() {
     console.log('04 ----> Who are you');
 
+    peer_name = window.localStorage.peer_name ? window.localStorage.peer_name : '';
+    if (getCookie(room_id + '_name')) {
+        peer_name = getCookie(room_id + '_name');
+    }
+
+    /* TODO: check that peer_name is username and
+    room_id is the same as first part of username when split at _
+    because username is of the form roomid_user
+    If this check fails, clear all cookies and localStorage, exit room and throw error
+    */ 
+
     if (peer_name) {
         checkMedia();
         getPeerInfo();
         joinRoom(peer_name, room_id);
         return;
     }
-
-    let default_name = window.localStorage.peer_name ? window.localStorage.peer_name : '';
-    if (getCookie(room_id + '_name')) {
-        default_name = getCookie(room_id + '_name');
-    }
-
-    Swal.fire({
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        background: swalBackground,
-        imageAlt: 'mirotalksfu-username',
-        imageUrl: image.username,
-        input: 'text',
-        inputPlaceholder: 'Enter your name',
-        inputValue: default_name,
-        html: `<br />
-        <div style="padding: 10px;">
-            <button id="initAudioButton" class="fas fa-microphone" onclick="handleAudio(event)"></button>
-            <button id="initVideoButton" class="fas fa-video" onclick="handleVideo(event)"></button>
-            <button id="initAudioVideoButton" class="fas fa-eye" onclick="handleAudioVideo(event)"></button>
-        </div>`,
-        confirmButtonText: `Join meeting`,
-        showClass: {
-            popup: 'animate__animated animate__fadeInDown',
-        },
-        hideClass: {
-            popup: 'animate__animated animate__fadeOutUp',
-        },
-        inputValidator: (name) => {
-            if (!name) return 'Please enter your name';
-            if (!getCookie(room_id + '_name')) {
-                window.localStorage.peer_name = name;
-            }
-            setCookie(room_id + '_name', name, 30);
-            peer_name = name;
-        },
-    }).then(() => {
-        getPeerInfo();
-        joinRoom(peer_name, room_id);
-    });
 
     if (!DetectRTC.isMobileDevice) {
         setTippy('initAudioButton', 'Toggle the audio', 'left');
@@ -568,7 +537,7 @@ async function shareRoom(useNavigator = false) {
             } else if (result.isDenied) {
                 let message = {
                     email: '',
-                    subject: 'Please join our MiroTalkSfu Video Chat Meeting',
+                    subject: 'Please join our Video Chat Meeting',
                     body: 'Click to join: ' + RoomURL,
                 };
                 shareRoomByEmail(message);
@@ -700,6 +669,7 @@ function roomIsReady() {
     BUTTONS.main.aboutButton && show(aboutButton);
     if (!DetectRTC.isMobileDevice) show(pinUnpinGridDiv);
     handleButtons();
+    rc.toggleChat();  // Show chat by default
     handleSelects();
     handleInputs();
     startSessionTimer();
@@ -827,9 +797,6 @@ function handleButtons() {
     };
     tabStylingBtn.onclick = (e) => {
         rc.openTab(e, 'tabStyling');
-    };
-    tabLanguagesBtn.onclick = (e) => {
-        rc.openTab(e, 'tabLanguages');
     };
     chatButton.onclick = () => {
         rc.toggleChat();
@@ -1278,7 +1245,7 @@ function leaveFeedback() {
         background: swalBackground,
         imageUrl: image.feedback,
         title: 'Leave a feedback',
-        text: 'Do you want to rate your MiroTalk experience?',
+        text: 'Do you want to rate your  experience?',
         confirmButtonText: `Yes`,
         denyButtonText: `No`,
         showClass: {
@@ -1835,12 +1802,6 @@ async function getRoomParticipants(refresh = false) {
 async function getParticipantsTable(peers) {
     let table = `
     <div>
-        <button
-            id="inviteParticipants"
-            onclick="shareRoom(true);"
-        ><i class="fas fa-user-plus"></i>&nbsp; Invite Someone</button>
-    </div>
-    <div>
         <input
             id="searchParticipants"
             type="text"
@@ -2086,11 +2047,9 @@ function showAbout() {
         html: `
         <br/>
         <div id="about">
-            <b><a href="https://github.com/miroslavpejic85/mirotalksfu" class="umami--click--github" target="_blank">Open Source</a></b> project
-            <br/><br />
-            <button class="pulsate umami--click--sponsors" onclick="window.open('https://github.com/sponsors/miroslavpejic85?o=esb')"><i class="fas fa-heart"></i> Support</button>
+            <b>About Us</b>
             <br /><br />
-            Contact: <a href="https://www.linkedin.com/in/miroslav-pejic-976a07101/" class="umami--click--linkedin" target="_blank"> Miroslav Pejic</a>
+            Contact: <a href="#">Email Us</a>
         </div>
         `,
         showClass: {

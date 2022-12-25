@@ -10,7 +10,7 @@ const isRulesActive = true;
 
 const BUTTONS = {
     main: {
-        shareButton: true,
+        shareButton: false,
         startAudioButton: true,
         startVideoButton: true,
         startScreenButton: true,
@@ -18,13 +18,13 @@ const BUTTONS = {
         chatButton: true,
         whiteboardButton: true,
         settingsButton: true,
-        aboutButton: true, // Please keep me always visible, thank you!
+        aboutButton: false,
         exitButton: true,
     },
     settings: {
-        lockRoomButton: true,
-        unlockRoomButton: true,
-        lobbyButton: true,
+        lockRoomButton: false,
+        unlockRoomButton: false,
+        lobbyButton: false,
         participantsButton: true,
         tabRecording: true,
     },
@@ -87,9 +87,14 @@ function handleRules(isPresenter) {
         BUTTONS.consumerVideo.muteVideoButton = true;
         //...
     }
+    /*
     // main. settings.
     BUTTONS.settings.lockRoomButton ? show(lockRoomButton) : hide(lockRoomButton);
     BUTTONS.settings.unlockRoomButton ? show(unlockRoomButton) : hide(unlockRoomButton);
     BUTTONS.settings.lobbyButton ? show(lobbyButton) : hide(lobbyButton);
     //...
+    */
+    hide(lockRoomButton);
+    hide(unlockRoomButton);
+    hide(lobbyButton);
 }

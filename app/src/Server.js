@@ -85,10 +85,7 @@ const host = 'https://' + 'localhost' + ':' + config.listenPort; // config.liste
 const announcedIP = config.mediasoup.webRtcTransport.listenIps[0].announcedIp;
 
 const hostCfg = {
-    protected: config.hostProtected,
-    username: config.hostUsername,
-    password: config.hostPassword,
-    authenticated: !config.hostProtected,
+    authenticated: false,
 };
 
 const apiBasePath = '/api/v1'; // api endpoint path
@@ -136,7 +133,6 @@ const dir = {
 // html views
 const views = {
     about: path.join(__dirname, '../../', 'public/views/about.html'),
-    landing: path.join(__dirname, '../../', 'public/views/landing.html'),
     login: path.join(__dirname, '../../', 'public/views/login.html'),
     newRoom: path.join(__dirname, '../../', 'public/views/newroom.html'),
     notFound: path.join(__dirname, '../../', 'public/views/404.html'),
@@ -177,47 +173,35 @@ app.use((err, req, res, next) => {
 
 // main page
 app.get(['/'], (req, res) => {
-    if (hostCfg.protected == true) {
-        hostCfg.authenticated = false;
-        res.sendFile(views.login);
-    } else {
-        res.sendFile(views.landing);
-    }
+    hostCfg.authenticated = false;
+    res.sendFile(views.login);
 });
 
 // handle login on host protected
 app.get(['/login'], (req, res) => {
-    if (hostCfg.protected == true) {
-        let ip = getIP(req);
-        log.debug(`Request login to host from: ${ip}`, req.query);
-        const { username, password } = req.query;
-        if (username == hostCfg.username && password == hostCfg.password) {
-            hostCfg.authenticated = true;
-            authHost = new Host(ip, true);
-            log.debug('LOGIN OK', { ip: ip, authorized: authHost.isAuthorized(ip) });
-            res.sendFile(views.landing);
-        } else {
-            log.debug('LOGIN KO', { ip: ip, authorized: false });
-            hostCfg.authenticated = false;
-            res.sendFile(views.login);
-        }
+    let ip = getIP(req);
+    log.debug(`Request login to host from: ${ip}`, req.query);
+    const { username, password } = req.query;
+    if (config.accounts.hasOwnProperty(username) && config.accounts[username] == password) {
+        hostCfg.authenticated = true;
+        authHost = new Host(ip, true);
+        log.debug('LOGIN OK', { ip: ip, authorized: authHost.isAuthorized(ip) });
+        res.sendFile(views.newRoom);
     } else {
-        res.redirect('/');
+        log.debug('LOGIN KO', { ip: ip, authorized: false });
+        hostCfg.authenticated = false;
+        res.sendFile(views.login);
     }
 });
 
 // set new room name and join
 app.get(['/newroom'], (req, res) => {
-    if (hostCfg.protected == true) {
-        let ip = getIP(req);
-        if (allowedIP(ip)) {
-            res.sendFile(views.newRoom);
-        } else {
-            hostCfg.authenticated = false;
-            res.sendFile(views.login);
-        }
-    } else {
+    let ip = getIP(req);
+    if (allowedIP(ip)) {
         res.sendFile(views.newRoom);
+    } else {
+        hostCfg.authenticated = false;
+        res.sendFile(views.login);
     }
 });
 
@@ -914,12 +898,10 @@ function allowedIP(ip) {
     return authHost != null && authHost.isAuthorized(ip);
 }
 function removeIP(socket) {
-    if (hostCfg.protected == true) {
-        let ip = socket.handshake.address;
-        if (ip && allowedIP(ip)) {
-            authHost.deleteIP(ip);
-            hostCfg.authenticated = false;
-            log.debug('Remove IP from auth', { ip: ip });
-        }
+    let ip = socket.handshake.address;
+    if (ip && allowedIP(ip)) {
+        authHost.deleteIP(ip);
+        hostCfg.authenticated = false;
+        log.debug('Remove IP from auth', { ip: ip });
     }
 }
